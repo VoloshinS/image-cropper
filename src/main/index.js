@@ -2,7 +2,6 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.min.css';
 
 import './main.less';
-// import defaultSrc from './assets/sample.jpg';
 
 export default class Main extends React.Component {
   constructor(props) {
@@ -24,17 +23,22 @@ export default class Main extends React.Component {
     const { width, height } = this.state;
 
     if (file) {
+      const name = file.name.replace(/\.\w+$/, '');
       const reader = new FileReader();
 
-      reader.onload = (e) => this.onLoad(e.target.result);
+      reader.onload = (e) => this.onLoad(e.target.result, name);
       reader.readAsDataURL(file);
     }
   }
 
-  onLoad(src) {
+  onLoad(src, name = 'image') {
     const { width, height } = this.state;
 
-    this.setState({ src }, () => {
+    this.setState({ src, name: `${ name }_cropped` }, () => {
+      if (this.cropper) {
+        this.cropper.destroy();
+      }
+
       this.cropper = new Cropper(this.image, {
         aspectRatio: width / height
       });
@@ -45,7 +49,9 @@ export default class Main extends React.Component {
     const { width, height } = this.state;
     const canvas = this.cropper.getCroppedCanvas({ width, height });
 
-    window.location.href = canvas.toDataURL();
+    this.setState({href: canvas.toDataURL()}, () => {
+      this.downloadBtn.click();
+    });
   }
 
   onSizeChange(attr, e) {
@@ -53,13 +59,13 @@ export default class Main extends React.Component {
   }
 
   render() {
-    const { src, width, height, cropped } = this.state;
+    const { src, width, height, cropped, href, name } = this.state;
 
     return (
       <div className="uk-container uk-container-small">
         <h1 className="uk-heading-primary">Обрезка картинок</h1>
         <form className="uk-margin">
-          <div className="uk-form-custom">
+          <div className="uk-form-custom uk-form-custom-file">
             <input type="file" id="file" onChange={this.onFileAdded.bind(this)} />
             <button type="button" className={'uk-button uk-button-' + (src ? 'default' : 'primary')}>
               Выберите файл
@@ -81,14 +87,15 @@ export default class Main extends React.Component {
           </div>
           { !src && <div className="empty-image" /> }
           <img ref={ image => this.image = image } src={src} />
-          <div className="uk-margin">
-            <a href={cropped}
-               className={'uk-button uk-button-' + (src ? 'primary' : 'default')}
-               onClick={this.download.bind(this)}>
-              Обрезать
-            </a>
-          </div>
         </form>
+        <div className="uk-margin">
+          <button disabled={!src}
+             className={'uk-button uk-button-' + (src ? 'primary' : 'default')}
+             onClick={this.download.bind(this)}>
+            Обрезать
+          </button>
+          <a ref={(el) => this.downloadBtn = el} href={href} download={name} />
+        </div>
       </div>
     );
   }

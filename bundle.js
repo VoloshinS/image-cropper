@@ -21715,8 +21715,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-// import defaultSrc from './assets/sample.jpg';
-
 var Main = function (_React$Component) {
   _inherits(Main, _React$Component);
 
@@ -21752,10 +21750,11 @@ var Main = function (_React$Component) {
 
 
       if (file) {
+        var name = file.name.replace(/\.\w+$/, '');
         var reader = new FileReader();
 
         reader.onload = function (e) {
-          return _this2.onLoad(e.target.result);
+          return _this2.onLoad(e.target.result, name);
         };
         reader.readAsDataURL(file);
       }
@@ -21765,12 +21764,17 @@ var Main = function (_React$Component) {
     value: function onLoad(src) {
       var _this3 = this;
 
+      var name = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'image';
       var _state2 = this.state,
           width = _state2.width,
           height = _state2.height;
 
 
-      this.setState({ src: src }, function () {
+      this.setState({ src: src, name: name + '_cropped' }, function () {
+        if (_this3.cropper) {
+          _this3.cropper.destroy();
+        }
+
         _this3.cropper = new _cropperjs2.default(_this3.image, {
           aspectRatio: width / height
         });
@@ -21779,13 +21783,17 @@ var Main = function (_React$Component) {
   }, {
     key: 'download',
     value: function download() {
+      var _this4 = this;
+
       var _state3 = this.state,
           width = _state3.width,
           height = _state3.height;
 
       var canvas = this.cropper.getCroppedCanvas({ width: width, height: height });
 
-      window.location.href = canvas.toDataURL();
+      this.setState({ href: canvas.toDataURL() }, function () {
+        _this4.downloadBtn.click();
+      });
     }
   }, {
     key: 'onSizeChange',
@@ -21795,13 +21803,15 @@ var Main = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
+      var _this5 = this;
 
       var _state4 = this.state,
           src = _state4.src,
           width = _state4.width,
           height = _state4.height,
-          cropped = _state4.cropped;
+          cropped = _state4.cropped,
+          href = _state4.href,
+          name = _state4.name;
 
 
       return React.createElement(
@@ -21817,7 +21827,7 @@ var Main = function (_React$Component) {
           { className: 'uk-margin' },
           React.createElement(
             'div',
-            { className: 'uk-form-custom' },
+            { className: 'uk-form-custom uk-form-custom-file' },
             React.createElement('input', { type: 'file', id: 'file', onChange: this.onFileAdded.bind(this) }),
             React.createElement(
               'button',
@@ -21847,19 +21857,22 @@ var Main = function (_React$Component) {
           ),
           !src && React.createElement('div', { className: 'empty-image' }),
           React.createElement('img', { ref: function ref(image) {
-              return _this4.image = image;
-            }, src: src }),
+              return _this5.image = image;
+            }, src: src })
+        ),
+        React.createElement(
+          'div',
+          { className: 'uk-margin' },
           React.createElement(
-            'div',
-            { className: 'uk-margin' },
-            React.createElement(
-              'a',
-              { href: cropped,
-                className: 'uk-button uk-button-' + (src ? 'primary' : 'default'),
-                onClick: this.download.bind(this) },
-              '\u041E\u0431\u0440\u0435\u0437\u0430\u0442\u044C'
-            )
-          )
+            'button',
+            { disabled: !src,
+              className: 'uk-button uk-button-' + (src ? 'primary' : 'default'),
+              onClick: this.download.bind(this) },
+            '\u041E\u0431\u0440\u0435\u0437\u0430\u0442\u044C'
+          ),
+          React.createElement('a', { ref: function ref(el) {
+              return _this5.downloadBtn = el;
+            }, href: href, download: name })
         )
       );
     }
@@ -38099,7 +38112,7 @@ exports = module.exports = __webpack_require__(25)(undefined);
 
 
 // module
-exports.push([module.i, ".empty-image {\n  width: 100%;\n  height: 300px;\n  border: 1px solid #e5e5e5;\n  display: block;\n}\n", ""]);
+exports.push([module.i, ".uk-container-small {\n  max-width: 720px;\n}\n.empty-image {\n  width: 100%;\n  height: 300px;\n  border: 1px solid #e5e5e5;\n  display: block;\n}\n", ""]);
 
 // exports
 
@@ -38113,7 +38126,7 @@ exports = module.exports = __webpack_require__(25)(undefined);
 
 
 // module
-exports.push([module.i, "", ""]);
+exports.push([module.i, ".uk-container-small {\n  max-width: 720px;\n}\n", ""]);
 
 // exports
 
