@@ -1,3 +1,4 @@
+const pluginsFor = require('./webpack.plugins');
 const webpack = require('webpack');
 
 module.exports = {
@@ -17,10 +18,7 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        loader: 'babel-loader',
-        query: {
-          presets: [ 'babel-preset-react', 'babel-preset-es2015' ]
-        }
+        loader: 'babel-loader'
       },
       {
         test: /\.less$/,
@@ -41,11 +39,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new webpack.ProvidePlugin({
-      React: 'react',
-      $: 'jquery',
-      jQuery: 'jquery'
-    })
-  ]
+  plugins: pluginsFor(process.env.NODE_ENV || 'development')
 }
