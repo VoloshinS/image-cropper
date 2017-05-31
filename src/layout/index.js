@@ -1,6 +1,10 @@
+import { Header } from './header';
+
 export const Layout = ({ children }) => (
-  <div className="uk-container uk-container-small">
-    <h1 className="uk-heading-primary">Обрезка картинок</h1>
-    { children }
+  <div>
+    <Header>Обрезка картинок</Header>
+    <div className="uk-container uk-container-small">
+      { children }
+    </div>
   </div>
 );
