@@ -4,9 +4,9 @@
   "description": "Online image cropper",
   "main": "bundle.js",
   "scripts": {
-    "start": "node node_modules/.bin/webpack-dev-server",
+    "start": "node node_modules/webpack-dev-server/bin/webpack-dev-server",
     "test": "node node_modules/.bin/karma start",
-    "build:prod": "node node_modules/.bin/webpack"
+    "build:prod": "node node_modules/webpack/bin/webpack"
   },
   "keywords": [
     "'crop",
